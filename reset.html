@@ -73,24 +73,19 @@
     <p id="message" role="status"></p>
   </div>
 </main>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://heshxrukrkcsgpdjhzhe.supabase.co/rest/v1/";
 const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
-
 const client = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY 
 );
-
 const resetUrl =
   "https://vibefind.github.io/index.html/reset.html";
-
 const message = document.getElementById("message");
 const requestForm = document.getElementById("requestForm");
 const changeForm = document.getElementById("changeForm");
-
 client.auth.onAuthStateChange((event) => {
   if (event === "PASSWORD_RECOVERY") {
     requestForm.classList.add("hidden");
@@ -98,54 +93,43 @@ client.auth.onAuthStateChange((event) => {
     message.textContent = "You can now set a new password.";
   }
 });
-
 requestForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const button = requestForm.querySelector("button");
   button.disabled = true;
   message.textContent = "Sending reset email...";
-
-  const email = document.getElementById("email").value.trim();
+ const email = document.getElementById("email").value.trim();
   const { error } = await client.auth.resetPasswordForEmail(
     email,
     { redirectTo: resetUrl }
   );
-
-  button.disabled = false;
+button.disabled = false;
   message.textContent = error
     ? error.message
     : "If the account exists, a reset email will be sent. Check your inbox.";
 });
-
 changeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const password =
+const password =
     document.getElementById("newPassword").value;
   const confirm =
     document.getElementById("confirmPassword").value;
-
-  if (password !== confirm) {
+if (password !== confirm) {
     message.textContent = "Passwords do not match.";
     return;
   }
-
-  const button = changeForm.querySelector("button");
+ const button = changeForm.querySelector("button");
   button.disabled = true;
   message.textContent = "Updating password...";
-
-  const { error } = await client.auth.updateUser({
+ const { error } = await client.auth.updateUser({
     password: password
   });
-
   button.disabled = false;
-
-  if (error) {
+if (error) {
     message.textContent = error.message;
     return;
   }
-
-  await client.auth.signOut();
+await client.auth.signOut();
   changeForm.classList.add("hidden");
   message.textContent =
     "Password updated! Open the VibeFind Admin Login page.";
