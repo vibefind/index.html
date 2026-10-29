@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VibeFind | Admin Dashboard</title>
+<style>
+* { box-sizing:border-box }
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#faf7f1;
+  color:#302b27;
+}
+main { max-width:650px;margin:45px auto;padding:18px }
+.card {
+  background:white;
+  border:1px solid #e6ddd1;
+  padding:28px;
+  border-radius:14px;
+  margin-bottom:18px;
+}
+h1,h2 { font-family:Georgia,serif;color:#604b3d }
+h1 { font-size:34px;margin-bottom:8px }
+h2 { font-size:25px }
+p { line-height:1.6 }
+label {
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin:16px 0 7px;
+}
+input,select,textarea {
+  width:100%;
+  padding:13px;
+  border:1px solid #d9cfc2;
+  border-radius:6px;
+  font:inherit;
+}
+textarea { min-height:95px;resize:vertical }
+button {
+  border:0;
+  padding:13px 20px;
+  border-radius:6px;
+  background:#604b3d;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+}
+button:hover { background:#79765d }
+button:disabled { opacity:.6;cursor:wait }
+.actions {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+.secondary { background:#eee6dc;color:#302b27 }
+.hidden { display:none }
+.status { margin-top:16px;white-space:pre-wrap }
+.small { color:#75695f;font-size:13px }
+</style>
+</head>
+<body>
+<main>
+  <h1>VibeFind.</h1>
+  <p class="small">Private Product Management Dashboard</p>
+
+  <section id="loginBox" class="card">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" type="email"
+        autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+        autocomplete="current-password" required>
+
+      <div class="actions">
+        <button type="submit" id="loginBtn">
+          Login
+        </button>
+      </div>
+    </form>
+    <p id="loginStatus" class="status" role="status"></p>
+  </section>
+
+  <section id="adminBox" class="card hidden">
+    <h2>Add New Product</h2>
+    <p class="small" id="welcome"></p>
+
+    <form id="productForm">
+      <label for="name">Product Name</label>
+      <input id="name" maxlength="180" required>
+
+      <label for="category">Category</label>
+      <select id="category" required>
+        <option value="Fashion">Fall Fashion</option>
+        <option value="Home">Cozy Home</option>
+        <option value="Kitchen">Kitchen & Coffee</option>
+        <option value="Beauty">Beauty Finds</option>
+      </select>
+
+      <label for="description">Description</label>
+      <textarea id="description" maxlength="600"></textarea>
+
+      <label for="image">Product Image URL</label>
+      <input id="image" type="url"
+        placeholder="https://example.com/photo.jpg">
+
+      <p class="small">
+        Use only product images you have permission
+        to display. Leave blank if unavailable.
+      </p>
+
+      <label for="affiliate">Affiliate / Product Link</label>
+      <input id="affiliate" type="url"
+        placeholder="https://..." required>
+
+      <div class="actions">
+        <button type="submit" id="saveBtn">
+          Add Product
+        </button>
+        <button type="button" id="logoutBtn"
+          class="secondary">
+          Logout
+        </button>
+      </div>
+    </form>
+
+    <p id="productStatus" class="status" role="status"></p>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// STEP 1: REPLACE THESE TWO VALUES ONLY
+
+const SUPABASE_URL = "https://heshxrukrkcsgpdjhzhe.supabase.co/rest/v1/";
+
+const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q;
+
+// Never paste a secret or service_role key here.
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY 
+);
+
+const loginBox = document.getElementById("loginBox");
+const adminBox = document.getElementById("adminBox");
+
+const loginStatus = document.getElementById("loginStatus");
+const productStatus = document.getElementById("productStatus");
+
+async function checkAdmin() {
+  const { data: userData, error: authError } =
+    await db.auth.getUser();
+
+  if (authError || !userData.user) {
+    adminBox.classList.add("hidden");
+    loginBox.classList.remove("hidden");
+    return;
+  }
+
+  const { data, error } = await db
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+
+  if (error || !data) {
+    adminBox.classList.add("hidden");
+    loginBox.classList.remove("hidden");
+    loginStatus.textContent =
+      "This account does not have admin access.";
+    await db.auth.signOut();
+    return;
+  }
+
+  loginStatus.textContent = "";
+  loginBox.classList.add("hidden");
+  adminBox.classList.remove("hidden");
+  document.getElementById("welcome").textContent =
+    "Signed in as " + userData.user.email;
+}
+
+document.getElementById("loginForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = document.getElementById("loginBtn");
+    button.disabled = true;
+    loginStatus.textContent = "Signing in...";
+
+    const { error } = await db.auth.signInWithPassword({
+      email: document.getElementById("email").value.trim(),
+      password: document.getElementById("password").value
+    });
+
+    button.disabled = false;
+
+    if (error) {
+      loginStatus.textContent = error.message;
+      return;
+    }
+
+    document.getElementById("password").value = "";
+    await checkAdmin();
+  });
+
+document.getElementById("productForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = document.getElementById("saveBtn");
+    button.disabled = true;
+    productStatus.textContent = "Saving product...";
+
+    const name = document.getElementById("name").value.trim();
+    const description =
+      document.getElementById("description").value.trim();
+
+    const category = document.getElementById("category").value;
+    const image = document.getElementById("image").value.trim();
+    const affiliate =
+      document.getElementById("affiliate").value.trim();
+
+    const validUrl = (value) => {
+      try {
+        return new URL(value).protocol === "https:";
+      } catch {
+        return false;
+      }
+    };
+
+    if (!validUrl(affiliate) ||
+       (image && !validUrl(image))) {
+      productStatus.textContent =
+        "Please use valid HTTPS URLs.";
+      button.disabled = false;
+      return;
+    }
+
+    const { error } = await db.from("products").insert({
+      name: name,
+      category: category,
+      description: description,
+      image_url: image || null,
+      affiliate_link: affiliate
+    });
+
+    button.disabled = false;
+
+    if (error) {
+      productStatus.textContent =
+        "Could not save: " + error.message;
+      return;
+    }
+
+    productStatus.textContent =
+      "Product saved successfully!";
+    document.getElementById("productForm").reset();
+  });
+
+document.getElementById("logoutBtn")
+  .addEventListener("click", async () => {
+    await db.auth.signOut();
+    adminBox.classList.add("hidden");
+    loginBox.classList.remove("hidden");
+  });
+
+checkAdmin();
+</script>
+</body>
+</html>
