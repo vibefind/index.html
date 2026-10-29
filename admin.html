@@ -133,7 +133,7 @@ const db = window.supabase.createClient(
 const loginBox = document.getElementById("loginBox");
 const adminBox = document.getElementById("adminBox");
 const loginStatus = document.getElementById("loginStatus");
-const productStatus = document.getElementById("productStatus");
+const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
 async function checkAdmin() {
   const { data: userData, error: authError } =
     await db.auth.getUser();
