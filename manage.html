@@ -1,444 +1,364 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VibeFind | Manage Products</title>
-<style>
-* {box-sizing:border-box}
-body {
-  background:#faf7f1;
-  color:#302b27;
-  font-family:Arial,sans-serif;
-  margin:0;
-}
-main {max-width:850px;margin:35px auto;padding:18px}
-h1,h2,h3 {font-family:Georgia,serif;color:#604b3d}
-.card {
-  background:#fff;
-  border:1px solid #e7ddd2;
-  padding:22px;
-  margin:18px 0;
-  border-radius:12px;
-}
-label {display:block;margin:13px 0 6px;font-weight:bold}
-input,select,textarea {
-  width:100%;
-  padding:12px;
-  border:1px solid #d9cfc2;
-  border-radius:6px;
-  font:inherit;
-}
-textarea {min-height:90px}
-button {
-  padding:11px 17px;
-  border:0;
-  background:#604b3d;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
-}
-button:disabled {opacity:.6;cursor:wait}
-.secondary {background:#77745b}
-.danger {background:#a33939}
-.actions {display:flex;gap:10px;flex-wrap:wrap}
-.hidden {display:none!important}
-.muted {color:#766b60;font-size:13px}
-.product {
-  display:flex;
-  gap:18px;
-  align-items:flex-start;
-}
-.product img {
-  width:92px;
-  height:92px;
-  object-fit:cover;
-  border-radius:8px;
-}
-.productInfo {flex:1;min-width:0}
-.productInfo h3 {margin:0 0 6px}
-.productInfo p {overflow-wrap:anywhere}
-#status {white-space:pre-wrap}
-@media(max-width:550px) {
-  .product {flex-direction:column}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeFind | Manage Products</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #faf7f1; color: #302b27; font-family: Arial, sans-serif; margin: 0; }
+    main { max-width: 850px; margin: 35px auto; padding: 18px; }
+    h1, h2, h3 { font-family: Georgia, serif; color: #604b3d; }
+    .card { background: #fff; border: 1px solid #e7ddd2; padding: 22px; margin: 18px 0; border-radius: 12px; }
+    label { display: block; margin: 13px 0 6px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #d9cfc2; border-radius: 6px; font: inherit; }
+    textarea { min-height: 90px; }
+    button { padding: 11px 17px; border: 0; background: #604b3d; color: white; border-radius: 6px; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    .secondary { background: #77745b; }
+    .danger { background: #a33939; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hidden { display: none !important; }
+    .muted { color: #766b60; font-size: 13px; }
+    .product { display: flex; gap: 18px; align-items: flex-start; }
+    .product img { width: 92px; height: 92px; object-fit: cover; border-radius: 8px; }
+    .productInfo { flex: 1; min-width: 0; }
+    .productInfo h3 { margin: 0 0 6px; }
+    .productInfo p { overflow-wrap: anywhere; }
+    #status { white-space: pre-wrap; }
+    @media (max-width: 550px) {
+      .product { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
+  <main>
+    <h1>VibeFind.</h1>
+    <p class="muted">Secure Product Management</p>
 
-<main>
-<h1>VibeFind.</h1>
-<p class="muted">Secure Product Management</p>
+    <!-- ADMIN LOGIN SECTION -->
+    <section id="loginSection" class="card">
+      <h2>Admin Login</h2>
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input id="email" type="email" required autocomplete="username">
+        
+        <label for="password">Password</label>
+        <input id="password" type="password" required autocomplete="current-password">
+        
+        <p><button type="submit">Login</button></p>
+      </form>
+    </section>
 
-<section id="loginSection" class="card">
-  <h2>Admin Login</h2>
-  <form id="loginForm">
-    <label>Email</label>
-    <input id="email" type="email" required
-      autocomplete="username">
-
-    <label>Password</label>
-    <input id="password" type="password" required
-      autocomplete="current-password">
-
-    <p><button type="submit">Login</button></p>
-  </form>
-</section>
-
-<section id="dashboard" class="hidden">
-  <div class="card">
-    <div class="actions">
-      <button id="refreshBtn">Refresh Products</button>
-      <button id="signoutBtn" class="secondary">Sign Out</button>
-    </div>
-  </div>
-
-  <section id="editor" class="card hidden">
-    <h2>Edit Product</h2>
-    <form id="editForm">
-      <label>Product Name</label>
-      <input id="name" required maxlength="180">
-
-      <label>Category</label>
-      <select id="category">
-        <option value="Fashion">Fall Fashion</option>
-        <option value="Home">Cozy Home</option>
-        <option value="Kitchen">Kitchen & Coffee</option>
-        <option value="Beauty">Beauty Finds</option>
-        <option value="Tech">Tech</option>
-      </select>
-
-      <label>Description</label>
-      <textarea id="description" maxlength="600"></textarea>
-
-      <label>Image URL (HTTPS)</label>
-      <input id="image" type="url">
-
-      <label>Affiliate Link (HTTPS)</label>
-      <input id="affiliate" type="url" required>
-
-      <p class="muted">
-        Use product images you have permission to display.
-      </p>
-
-      <div class="actions">
-        <button id="updateBtn" type="submit">
-          Save Changes
-        </button>
-        <button id="cancelBtn" type="button"
-          class="secondary">Cancel</button>
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard" class="hidden">
+      <div class="card">
+        <div class="actions">
+          <button id="refreshBtn">Refresh Products</button>
+          <button id="signoutBtn" class="secondary">Sign Out</button>
+        </div>
       </div>
-    </form>
-  </section>
 
-  <h2>All Products</h2>
-  <div id="productList"></div>
-</section>
+      <!-- EDITOR CARD -->
+      <section id="editor" class="card hidden">
+        <h2>Edit Product</h2>
+        <form id="editForm">
+          <label for="name">Product Name</label>
+          <input id="name" required maxlength="180">
 
-<p id="status" role="status"></p>
-</main>
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="Fashion">Fall Fashion</option>
+            <option value="Home">Cozy Home</option>
+            <option value="Kitchen">Kitchen & Coffee</option>
+            <option value="Beauty">Beauty Finds</option>
+            <option value="Tech">Tech</option>
+          </select>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL =
-  "https://heshxrukrkcsgpdjhzhe.supabase.co";
+          <label for="description">Description</label>
+          <textarea id="description" maxlength="600"></textarea>
 
-const SUPABASE_KEY =
-  "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
+          <label for="image">Image URL (HTTPS)</label>
+          <input id="image" type="url">
 
-// Only use your publishable key, never secret keys.
+          <label for="affiliate">Affiliate Link (HTTPS)</label>
+          <input id="affiliate" type="url" required>
 
-const statusBox = document.getElementById("status");
-const loginSection = document.getElementById("loginSection");
-const dashboard = document.getElementById("dashboard");
-const editor = document.getElementById("editor");
-const list = document.getElementById("productList");
+          <p class="muted">Use product images you have permission to display.</p>
 
-let db;
-let records = [];
-let editingId = null;
+          <div class="actions">
+            <button id="updateBtn" type="submit">Save Changes</button>
+            <button id="cancelBtn" type="button" class="secondary">Cancel</button>
+          </div>
+        </form>
+      </section>
 
-function status(message) {
-  statusBox.textContent = message;
-}
+      <h2>All Products</h2>
+      <div id="productList"></div>
+    </section>
 
-function validHttps(value) {
-  try {
-    return new URL(value).protocol === "https:";
-  } catch {
-    return false;
-  }
-}
+    <p id="status" role="status"></p>
+  </main>
 
-async function verifyAdmin() {
-  const {data, error} = await db.auth.getUser();
-  if (error || !data.user) return false;
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://heshxrukrkcsgpdjhzhe.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
 
-  const result = await db.from("admin_users")
-    .select("user_id")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
+    const statusBox = document.getElementById("status");
+    const loginSection = document.getElementById("loginSection");
+    const dashboard = document.getElementById("dashboard");
+    const editor = document.getElementById("editor");
+    const list = document.getElementById("productList");
 
-  if (result.error) throw result.error;
-  return Boolean(result.data);
-}
+    let db;
+    let records = [];
+    let editingId = null;
 
-async function showDashboard() {
-  const admin = await verifyAdmin();
-
-  if (!admin) {
-    loginSection.classList.remove("hidden");
-    dashboard.classList.add("hidden");
-    return;
-  }
-
-  loginSection.classList.add("hidden");
-  dashboard.classList.remove("hidden");
-  await loadProducts();
-}
-
-async function loadProducts() {
-  status("Loading products...");
-
-  const {data,error} = await db.from("products")
-    .select("id,name,category,description,image_url,affiliate_link")
-    .order("created_at",{ascending:false});
-
-  if (error) {
-    status("Load failed: " + error.message);
-    return;
-  }
-
-  records = data || [];
-  renderProducts();
-  status("Loaded " + records.length + " product(s).");
-}
-
-function renderProducts() {
-  list.replaceChildren();
-
-  if (!records.length) {
-    list.textContent = "No products found.";
-    return;
-  }
-
-  for (const product of records) {
-    const card = document.createElement("article");
-    card.className = "card product";
-
-    if (validHttps(product.image_url)) {
-      const photo = document.createElement("img");
-      photo.src = product.image_url;
-      photo.alt = product.name || "Product";
-      photo.loading = "lazy";
-      card.appendChild(photo);
+    function status(message) {
+      statusBox.textContent = message;
     }
 
-    const info = document.createElement("div");
-    info.className = "productInfo";
+    function validHttps(value) {
+      try {
+        return new URL(value).protocol === "https:";
+      } catch {
+        return false;
+      }
+    }
 
-    const name = document.createElement("h3");
-    name.textContent = product.name;
+    async function verifyAdmin() {
+      const { data, error } = await db.auth.getUser();
+      if (error || !data.user) return false;
+      
+      const result = await db.from("admin_users")
+        .select("user_id")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
 
-    const category = document.createElement("p");
-    category.className = "muted";
-    category.textContent = product.category;
+      if (result.error) throw result.error;
+      return Boolean(result.data);
+    }
 
-    const description = document.createElement("p");
-    description.textContent = product.description || "";
+    async function showDashboard() {
+      const admin = await verifyAdmin();
+      if (!admin) {
+        loginSection.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+        return;
+      }
+      loginSection.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+      await loadProducts();
+    }
 
-    const actions = document.createElement("div");
-    actions.className = "actions";
+    async function loadProducts() {
+      status("Loading products...");
+      const { data, error } = await db.from("products")
+        .select("id, name, category, description, image_url, affiliate_link")
+        .order("created_at", { ascending: false });
 
-    const edit = document.createElement("button");
-    edit.textContent = "Edit";
-    edit.addEventListener("click", () => {
-      openEditor(product);
+      if (error) {
+        status("Load failed: " + error.message);
+        return;
+      }
+      records = data || [];
+      renderProducts();
+      status("Loaded " + records.length + " product(s).");
+    }
+
+    function renderProducts() {
+      list.replaceChildren();
+      if (!records.length) {
+        list.textContent = "No products found.";
+        return;
+      }
+
+      for (const product of records) {
+        const card = document.createElement("article");
+        card.className = "card product";
+
+        if (validHttps(product.image_url)) {
+          const photo = document.createElement("img");
+          photo.src = product.image_url;
+          photo.alt = product.name || "Product";
+          photo.loading = "lazy";
+          card.appendChild(photo);
+        }
+
+        const info = document.createElement("div");
+        info.className = "productInfo";
+
+        const name = document.createElement("h3");
+        name.textContent = product.name;
+
+        const category = document.createElement("p");
+        category.className = "muted";
+        category.textContent = product.category;
+
+        const description = document.createElement("p");
+        description.textContent = product.description || "";
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const edit = document.createElement("button");
+        edit.textContent = "Edit";
+        edit.addEventListener("click", () => openEditor(product));
+
+        const remove = document.createElement("button");
+        remove.textContent = "Delete";
+        remove.className = "danger";
+        remove.addEventListener("click", () => deleteProduct(product));
+
+        actions.append(edit, remove);
+        info.append(name, category, description, actions);
+        card.appendChild(info);
+        list.appendChild(card);
+      }
+    }
+
+    function openEditor(product) {
+      editingId = product.id;
+      document.getElementById("name").value = product.name || "";
+      document.getElementById("category").value = ["Fashion", "Home", "Kitchen", "Beauty", "Tech"]
+        .find(x => x.toLowerCase() === String(product.category).toLowerCase()) || "Home";
+      document.getElementById("description").value = product.description || "";
+      document.getElementById("image").value = product.image_url || "";
+      document.getElementById("affiliate").value = product.affiliate_link || "";
+      
+      editor.classList.remove("hidden");
+      editor.scrollIntoView({ behavior: "smooth" });
+    }
+
+    document.getElementById("editForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!editingId) return;
+
+      const button = document.getElementById("updateBtn");
+      button.disabled = true;
+
+      try {
+        const name = document.getElementById("name").value.trim();
+        const category = document.getElementById("category").value;
+        const description = document.getElementById("description").value.trim();
+        const image = document.getElementById("image").value.trim();
+        const affiliate = document.getElementById("affiliate").value.trim();
+
+        if (!validHttps(affiliate) || (image && !validHttps(image))) {
+          throw new Error("Use valid HTTPS URLs.");
+        }
+
+        const { data, error } = await db.from("products")
+          .update({
+            name,
+            category,
+            description,
+            image_url: image || null,
+            affiliate_link: affiliate
+          })
+          .eq("id", editingId)
+          .select("id");
+
+        if (error) throw error;
+        if (!data || !data.length) {
+          throw new Error("No product was updated. Check permissions.");
+        }
+
+        editor.classList.add("hidden");
+        editingId = null;
+        await loadProducts();
+        status("Product updated successfully.");
+      } catch (error) {
+        status("Update failed: " + error.message);
+      } finally {
+        button.disabled = false;
+      }
     });
 
-    const remove = document.createElement("button");
-    remove.textContent = "Delete";
-    remove.className = "danger";
-    remove.addEventListener("click", () => {
-      deleteProduct(product);
-    });
+    async function deleteProduct(product) {
+      const confirmed = confirm('Permanently delete "' + product.name + '"?');
+      if (!confirmed) return;
 
-    actions.append(edit,remove);
-    info.append(name,category,description,actions);
-    card.appendChild(info);
-    list.appendChild(card);
-  }
-}
+      try {
+        status("Deleting product...");
+        const { data, error } = await db.from("products")
+          .delete()
+          .eq("id", product.id)
+          .select("id");
 
-function openEditor(product) {
-  editingId = product.id;
-  document.getElementById("name").value =
-    product.name || "";
-  document.getElementById("category").value =
-    ["Fashion","Home","Kitchen","Beauty","Tech"]
-      .find(x => x.toLowerCase() ===
-        String(product.category).toLowerCase()) || "Home";
-  document.getElementById("description").value =
-    product.description || "";
-  document.getElementById("image").value =
-    product.image_url || "";
-  document.getElementById("affiliate").value =
-    product.affiliate_link || "";
+        if (error) throw error;
+        if (!data || !data.length) {
+          throw new Error("No product was deleted. Check permissions.");
+        }
 
-  editor.classList.remove("hidden");
-  editor.scrollIntoView({behavior:"smooth"});
-}
+        if (editingId === product.id) {
+          editingId = null;
+          editor.classList.add("hidden");
+        }
 
-document.getElementById("editForm")
-.addEventListener("submit",async event => {
-  event.preventDefault();
-  if (!editingId) return;
-
-  const button = document.getElementById("updateBtn");
-  button.disabled = true;
-
-  try {
-    const name = document.getElementById("name").value.trim();
-    const category = document.getElementById("category").value;
-    const description =
-      document.getElementById("description").value.trim();
-    const image = document.getElementById("image").value.trim();
-    const affiliate =
-      document.getElementById("affiliate").value.trim();
-
-    if (!validHttps(affiliate) ||
-        (image && !validHttps(image))) {
-      throw new Error("Use valid HTTPS URLs.");
+        await loadProducts();
+        status("Product deleted successfully.");
+      } catch (error) {
+        status("Delete failed: " + error.message);
+      }
     }
 
-    const {data,error} = await db.from("products")
-      .update({
-        name,
-        category,
-        description,
-        image_url:image || null,
-        affiliate_link:affiliate
-      })
-      .eq("id",editingId)
-      .select("id");
-
-    if (error) throw error;
-    if (!data || !data.length) {
-      throw new Error("No product was updated. Check permissions.");
-    }
-
-    editor.classList.add("hidden");
-    editingId = null;
-    await loadProducts();
-    status("Product updated successfully.");
-
-  } catch(error) {
-    status("Update failed: " + error.message);
-  } finally {
-    button.disabled = false;
-  }
-});
-
-async function deleteProduct(product) {
-  const confirmed = confirm(
-    'Permanently delete "' + product.name + '"?'
-  );
-  if (!confirmed) return;
-
-  try {
-    status("Deleting product...");
-
-    const {data,error} = await db.from("products")
-      .delete()
-      .eq("id",product.id)
-      .select("id");
-
-    if (error) throw error;
-    if (!data || !data.length) {
-      throw new Error("No product was deleted. Check permissions.");
-    }
-
-    if (editingId === product.id) {
+    document.getElementById("cancelBtn").addEventListener("click", () => {
       editingId = null;
       editor.classList.add("hidden");
-    }
-
-    await loadProducts();
-    status("Product deleted successfully.");
-
-  } catch(error) {
-    status("Delete failed: " + error.message);
-  }
-}
-
-document.getElementById("cancelBtn")
-.addEventListener("click",() => {
-  editingId = null;
-  editor.classList.add("hidden");
-});
-
-document.getElementById("refreshBtn")
-.addEventListener("click",loadProducts);
-
-document.getElementById("signoutBtn")
-.addEventListener("click",async () => {
-  await db.auth.signOut();
-  dashboard.classList.add("hidden");
-  loginSection.classList.remove("hidden");
-  status("Signed out.");
-});
-
-document.getElementById("loginForm")
-.addEventListener("submit",async event => {
-  event.preventDefault();
-  status("Signing in...");
-
-  const button = event.target.querySelector("button");
-  button.disabled = true;
-
-  try {
-    const {error} = await db.auth.signInWithPassword({
-      email:document.getElementById("email").value.trim(),
-      password:document.getElementById("password").value
     });
-    if (error) throw error;
 
-    document.getElementById("password").value = "";
+    document.getElementById("refreshBtn").addEventListener("click", loadProducts);
 
-    if (!await verifyAdmin()) {
+    document.getElementById("signoutBtn").addEventListener("click", async () => {
       await db.auth.signOut();
-      throw new Error("This user is not an administrator.");
+      dashboard.classList.add("hidden");
+      loginSection.classList.remove("hidden");
+      status("Signed out.");
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      status("Signing in...");
+      const button = event.target.querySelector("button");
+      button.disabled = true;
+
+      try {
+        const { error } = await db.auth.signInWithPassword({
+          email: document.getElementById("email").value.trim(),
+          password: document.getElementById("password").value
+        });
+
+        if (error) throw error;
+        document.getElementById("password").value = "";
+
+        if (!(await verifyAdmin())) {
+          await db.auth.signOut();
+          throw new Error("This user is not an administrator.");
+        }
+
+        await showDashboard();
+      } catch (error) {
+        status("Login failed: " + error.message);
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    async function initialize() {
+      try {
+        if (!window.supabase) {
+          throw new Error("Supabase library failed to load.");
+        }
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        await showDashboard();
+      } catch (error) {
+        status("Setup error: " + error.message);
+      }
     }
 
-    await showDashboard();
-  } catch(error) {
-    status("Login failed: " + error.message);
-  } finally {
-    button.disabled = false;
-  }
-});
-
-async function initialize() {
-  try {
-    if (!window.supabase) {
-      throw new Error("Supabase library failed to load.");
-    }
-    if (SUPABASE_KEY.includes("PASTE_YOUR")) {
-      throw new Error("Add your Supabase publishable key.");
-    }
-
-    db = window.supabase.createClient(
-      SUPABASE_URL,SUPABASE_KEY
-    );
-
-    await showDashboard();
-
-  } catch(error) {
-    status("Setup error: " + error.message);
-  }
-}
-
-initialize();
-</script>
+    initialize();
+  </script>
 </body>
 </html>
