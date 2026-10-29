@@ -469,13 +469,136 @@ function renderProducts() {
         categoryIcons[normalizedCategory(p.category)] || "🛍️";
     }
 
-    const body = document.createElement("div");
-    body.className = "product-body";
+    <script>
+  const SUPABASE_URL = "https://heshxrukrkcsgpdjhzhe.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
+  const grid = document.getElementById("productGrid");
+  const search = document.getElementById("search");
+  const filter = document.getElementById("filter");
+  
+  let products = [];
+  const categoryIcons = {
+    fashion: "🍂",
+    home: "🏡",
+    kitchen: "☕",
+    beauty: "💅",
+    tech: "💻"
+  };
 
-    const type = document.createElement("span");
-    type.className = "product-type";
-    type.textContent = p.category || "Finds";
+  function normalizedCategory(value) {
+    return String(value || "").trim().toLowerCase();
+  }
 
+  function safeHttps(value) {
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" ? url.href : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function loadProducts() {
+    grid.textContent = "Loading products...";
+    try {
+      const endpoint = `${SUPABASE_URL}/rest/v1/products?select=name,category,description,image_url,affiliate_link&order=created_at.desc`;
+      const response = await fetch(endpoint, {
+        headers: { "apikey": SUPABASE_KEY }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Database request failed (${response.status})`);
+      }
+      
+      products = await response.json();
+      renderProducts();
+    } catch (error) {
+      grid.textContent = "Unable to load products: " + error.message;
+    }
+  }
+
+  function renderProducts() {
+    const term = search.value.trim().toLowerCase();
+    const selected = normalizedCategory(filter.value);
+
+    const filtered = products.filter(p => {
+      const category = normalizedCategory(p.category);
+      const matchCategory = selected === "all" || selected === category;
+      const matchSearch = [p.name, p.category, p.description]
+        .join(" ")
+        .toLowerCase()
+        .includes(term);
+      return matchCategory && matchSearch;
+    });
+
+    grid.replaceChildren();
+
+    if (!filtered.length) {
+      grid.textContent = "No matching products found.";
+      return;
+    }
+
+    for (const p of filtered) {
+      const card = document.createElement("article");
+      card.className = "product";
+
+      const photo = document.createElement("div");
+      photo.className = "product-image";
+      const imageUrl = safeHttps(p.image_url);
+
+      if (imageUrl) {
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = p.name || "Product";
+        img.loading = "lazy";
+        photo.appendChild(img);
+      } else {
+        photo.textContent = categoryIcons[normalizedCategory(p.category)] || "🛍️";
+      }
+
+      const body = document.createElement("div");
+      body.className = "product-body";
+
+      const type = document.createElement("span");
+      type.className = "product-type";
+      type.textContent = p.category || "Finds";
+
+      const title = document.createElement("h3");
+      title.textContent = p.name || "Product";
+
+      const description = document.createElement("p");
+      description.textContent = p.description || "";
+
+      const linkUrl = safeHttps(p.affiliate_link);
+      const button = document.createElement(linkUrl ? "a" : "span");
+      button.className = "btn";
+      button.textContent = linkUrl ? "Explore Find" : "Link unavailable";
+
+      if (linkUrl) {
+        button.href = linkUrl;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer sponsored";
+      }
+
+      body.append(type, title, description, button);
+      card.append(photo, body);
+      grid.appendChild(card);
+    }
+  }
+
+  search.addEventListener("input", renderProducts);
+  filter.addEventListener("change", renderProducts);
+
+  document.querySelectorAll(".category").forEach(button => {
+    button.addEventListener("click", () => {
+      filter.value = button.dataset.category;
+      renderProducts();
+      document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
+    });
+  });
+
+  loadProducts();
+</script>
     const title = document.createElement("h3");
     title.textContent = p.name || "Product";
 
