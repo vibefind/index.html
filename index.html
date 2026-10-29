@@ -391,7 +391,17 @@ function safeHttps(value) {
   }
 }
 
+const SUPABASE_URL =
+  "https://heshxrukrkcsgpdjhzhe.supabase.co";
+
+const SUPABASE_KEY =
+  "YOUR_PUBLISHABLE_KEY";
+
+// ...rest of the connection code...
+
 async function loadProducts() {
+  // Fetch products from Supabase
+}
   grid.textContent = "Loading products...";
 
   try {
