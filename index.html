@@ -355,14 +355,13 @@ footer {
   <p>Curated inspiration for fashion, home, kitchen and beauty.</p>
 </footer>
 
-<script>
 
 <script>
 const SUPABASE_URL =
   "https://heshxrukrkcsgpdjhzhe.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
+  "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
 const grid = document.getElementById("productGrid");
 const search = document.getElementById("search");
@@ -370,19 +369,19 @@ const filter = document.getElementById("filter");
 
 let products = [];
 
-const categoryIcons = {
-  fashion: "🍂",
-  home: "🏡",
-  kitchen: "☕",
-  beauty: "💅",
-  tech: "💻"
+const icons = {
+  fashion:"🍂",
+  home:"🏡",
+  kitchen:"☕",
+  beauty:"💅",
+  tech:"💻"
 };
 
-function normalizedCategory(value) {
+function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
 
-function safeHttps(value) {
+function httpsUrl(value) {
   try {
     const url = new URL(value);
     return url.protocol === "https:" ? url.href : null;
@@ -391,453 +390,81 @@ function safeHttps(value) {
   }
 }
 
-const SUPABASE_URL =
-  "https://heshxrukrkcsgpdjhzhe.supabase.co";
-
-const SUPABASE_KEY =
-  "YOUR_PUBLISHABLE_KEY";
-
-// ...rest of the connection code...
-
 async function loadProducts() {
-  // Fetch products from Supabase
-}
- <script>
-  const SUPABASE_URL = "https://heshxrukrkcsgpdjhzhe.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
-  const grid = document.getElementById("productGrid");
-  const search = document.getElementById("search");
-  const filter = document.getElementById("filter");
-  
-  let products = [];
-  const categoryIcons = {
-    fashion: "🍂",
-    home: "🏡",
-    kitchen: "☕",
-    beauty: "💅",
-    tech: "💻"
-  };
+  grid.textContent = "Loading products...";
 
-  function normalizedCategory(value) {
-    return String(value || "").trim().toLowerCase();
-  }
-
-  function safeHttps(value) {
-    try {
-      const url = new URL(value);
-      return url.protocol === "https:" ? url.href : null;
-    } catch {
-      return null;
+  try {
+    if (SUPABASE_KEY.includes("PASTE_YOUR")) {
+      throw new Error("Publishable key is missing.");
     }
-  }
 
-  async function loadProducts() {
-    grid.textContent = "Loading products...";
-    try {
-      const endpoint = `${SUPABASE_URL}/rest/v1/products?select=name,category,description,image_url,affiliate_link&order=created_at.desc`;
-      const response = await fetch(endpoint, {
-        headers: { "apikey": SUPABASE_KEY }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Database request failed (${response.status})`);
+    const endpoint = SUPABASE_URL +
+      "/rest/v1/products" +
+      "?select=name,category,description,image_url,affiliate_link" +
+      "&order=created_at.desc";
+
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: SUPABASE_KEY
       }
-      
-      products = await response.json();
-      renderProducts();
-    } catch (error) {
-      grid.textContent = "Unable to load products: " + error.message;
-    }
-  }
-
-  function renderProducts() {
-    const term = search.value.trim().toLowerCase();
-    const selected = normalizedCategory(filter.value);
-
-    const filtered = products.filter(p => {
-      const category = normalizedCategory(p.category);
-      const matchCategory = selected === "all" || selected === category;
-      const matchSearch = [p.name, p.category, p.description]
-        .join(" ")
-        .toLowerCase()
-        .includes(term);
-      return matchCategory && matchSearch;
     });
 
-    grid.replaceChildren();
-
-    if (!filtered.length) {
-      grid.textContent = "No matching products found.";
-      return;
+    if (!response.ok) {
+      throw new Error("Database error: " + response.status);
     }
 
-    for (const p of filtered) {
-      const card = document.createElement("article");
-      card.className = "product";
-
-      const photo = document.createElement("div");
-      photo.className = "product-image";
-      const imageUrl = safeHttps(p.image_url);
-
-      if (imageUrl) {
-        const img = document.createElement("img");
-        img.src = imageUrl;
-        img.alt = p.name || "Product";
-        img.loading = "lazy";
-        photo.appendChild(img);
-      } else {
-        photo.textContent = categoryIcons[normalizedCategory(p.category)] || "🛍️";
-      }
-
-      const body = document.createElement("div");
-      body.className = "product-body";
-
-      const type = document.createElement("span");
-      type.className = "product-type";
-      type.textContent = p.category || "Finds";
-
-      const title = document.createElement("h3");
-      title.textContent = p.name || "Product";
-
-      const description = document.createElement("p");
-      description.textContent = p.description || "";
-
-      const linkUrl = safeHttps(p.affiliate_link);
-      const button = document.createElement(linkUrl ? "a" : "span");
-      button.className = "btn";
-      button.textContent = linkUrl ? "Explore Find" : "Link unavailable";
-
-      if (linkUrl) {
-        button.href = linkUrl;
-        button.target = "_blank";
-        button.rel = "noopener noreferrer sponsored";
-      }
-
-      body.append(type, title, description, button);
-      card.append(photo, body);
-      grid.appendChild(card);
-    }
-  }
-
-  search.addEventListener("input", renderProducts);
-  filter.addEventListener("change", renderProducts);
-
-  document.querySelectorAll(".category").forEach(button => {
-    button.addEventListener("click", () => {
-      filter.value = button.dataset.category;
-      renderProducts();
-      document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
-    });
-  });
-
-  loadProducts();
-</script>
-    const photo = document.createElement("div");
-    photo.className = "product-image";
-
-    const imageUrl = safeHttps(p.image_url);
-
-    if (imageUrl) {
-      const img = document.createElement("img");
-      img.src = imageUrl;
-      img.alt = p.name || "Product";
-      img.loading = "lazy";
-      photo.appendChild(img);
-    } else {
-      photo.textContent =
-        categoryIcons[normalizedCategory(p.category)] || "🛍️";
-    }
-
-    <script>
-  const SUPABASE_URL = "https://heshxrukrkcsgpdjhzhe.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
-  const grid = document.getElementById("productGrid");
-  const search = document.getElementById("search");
-  const filter = document.getElementById("filter");
-  
-  let products = [];
-  const categoryIcons = {
-    fashion: "🍂",
-    home: "🏡",
-    kitchen: "☕",
-    beauty: "💅",
-    tech: "💻"
-  };
-
-  function normalizedCategory(value) {
-    return String(value || "").trim().toLowerCase();
-  }
-
-  function safeHttps(value) {
-    try {
-      const url = new URL(value);
-      return url.protocol === "https:" ? url.href : null;
-    } catch {
-      return null;
-    }
-  }
-
-  async function loadProducts() {
-    grid.textContent = "Loading products...";
-    try {
-      const endpoint = `${SUPABASE_URL}/rest/v1/products?select=name,category,description,image_url,affiliate_link&order=created_at.desc`;
-      const response = await fetch(endpoint, {
-        headers: { "apikey": SUPABASE_KEY }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Database request failed (${response.status})`);
-      }
-      
-      products = await response.json();
-      renderProducts();
-    } catch (error) {
-      grid.textContent = "Unable to load products: " + error.message;
-    }
-  }
-
-  function renderProducts() {
-    const term = search.value.trim().toLowerCase();
-    const selected = normalizedCategory(filter.value);
-
-    const filtered = products.filter(p => {
-      const category = normalizedCategory(p.category);
-      const matchCategory = selected === "all" || selected === category;
-      const matchSearch = [p.name, p.category, p.description]
-        .join(" ")
-        .toLowerCase()
-        .includes(term);
-      return matchCategory && matchSearch;
-    });
-
-    grid.replaceChildren();
-
-    if (!filtered.length) {
-      grid.textContent = "No matching products found.";
-      return;
-    }
-
-    for (const p of filtered) {
-      const card = document.createElement("article");
-      card.className = "product";
-
-      const photo = document.createElement("div");
-      photo.className = "product-image";
-      const imageUrl = safeHttps(p.image_url);
-
-      if (imageUrl) {
-        const img = document.createElement("img");
-        img.src = imageUrl;
-        img.alt = p.name || "Product";
-        img.loading = "lazy";
-        photo.appendChild(img);
-      } else {
-        photo.textContent = categoryIcons[normalizedCategory(p.category)] || "🛍️";
-      }
-
-      const body = document.createElement("div");
-      body.className = "product-body";
-
-      const type = document.createElement("span");
-      type.className = "product-type";
-      type.textContent = p.category || "Finds";
-
-      const title = document.createElement("h3");
-      title.textContent = p.name || "Product";
-
-      const description = document.createElement("p");
-      description.textContent = p.description || "";
-
-      const linkUrl = safeHttps(p.affiliate_link);
-      const button = document.createElement(linkUrl ? "a" : "span");
-      button.className = "btn";
-      button.textContent = linkUrl ? "Explore Find" : "Link unavailable";
-
-      if (linkUrl) {
-        button.href = linkUrl;
-        button.target = "_blank";
-        button.rel = "noopener noreferrer sponsored";
-      }
-
-      body.append(type, title, description, button);
-      card.append(photo, body);
-      grid.appendChild(card);
-    }
-  }
-
-  search.addEventListener("input", renderProducts);
-  filter.addEventListener("change", renderProducts);
-
-  document.querySelectorAll(".category").forEach(button => {
-    button.addEventListener("click", () => {
-      filter.value = button.dataset.category;
-      renderProducts();
-      document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
-    });
-  });
-
-  loadProducts();
-</script>
-    const title = document.createElement("h3");
-    title.textContent = p.name || "Product";
-
-    const description = document.createElement("p");
-    description.textContent = p.description || "";
-
-    const linkUrl = safeHttps(p.affiliate_link);
-
-    const button = document.createElement(
-      linkUrl ? "a" : "span"
-    );
-    button.className = "btn";
-    button.textContent = linkUrl
-      ? "Explore Find"
-      : "Link unavailable";
-
-    if (linkUrl) {
-      button.href = linkUrl;
-      button.target = "_blank";
-      button.rel = "noopener noreferrer sponsored";
-    }
-
-    body.append(type, title, description, button);
-    card.append(photo, body);
-    grid.appendChild(card);
-  }
-}
-
-search.addEventListener("input", renderProducts);
-filter.addEventListener("change", renderProducts);
-
-document.querySelectorAll(".category").forEach(button => {
-  button.addEventListener("click", () => {
-    filter.value = button.dataset.category;
+    products = await response.json();
     renderProducts();
-    document.getElementById("shop").scrollIntoView({
-      behavior: "smooth"
-    });
-  });
-});
 
-loadProducts();
-</script>
-
-// Replace image: "" with your own permitted product image URL.
-// Replace link with the correct product affiliate or collection URL.
-
-const products = [
-  {
-    name:"Trendy Queen Chunky Knit Cardigan",
-    category:"Fashion",
-    emoji:"🧥",
-    image:"",
-    description:"A cozy layer for casual fall outfits.",
-    link:"https://benable.com/vibefind"
-  },
-  {
-    name:"Trendy Queen Wide-Leg Jeans",
-    category:"Fashion",
-    emoji:"👖",
-    image:"",
-    description:"Relaxed denim for everyday outfit styling.",
-    link:"https://benable.com/vibefind"
-  },
-  {
-    name:"Joryin Woven Crossbody Purse",
-    category:"Fashion",
-    emoji:"👜",
-    image:"",
-    description:"A woven handbag for styled everyday looks.",
-    link:"https://benable.com/vibefind"
-  },
-  {
-    name:"Rust Fleece Throw Blanket",
-    category:"Home",
-    emoji:"🛋️",
-    image:"",
-    description:"A rust-colored throw for cozy home styling.",
-    link:"https://benable.com/vibefind"
-  },
-  {
-    name:"GiNT 51oz White Thermal Coffee Carafe",
-    category:"Kitchen",
-    emoji:"☕",
-    image:"",
-    description:"A double-wall insulated 1.5L coffee carafe.",
-    link:"https://benable.com/vibefind"
-  },
-  {
-    name:"Tastyle Mini Single Serve Coffee Maker",
-    category:"Kitchen",
-    emoji:"🫖",
-    image:"",
-    description:"A coffee maker for K-Cup pods or ground coffee.",
-    link:"https://benable.com/vibefind"
-  },
-  {
-    name:"BTArtbox Halloween Press-On Nails",
-    category:"Beauty",
-    emoji:"💅",
-    image:"",
-    description:"Seasonal short almond press-on nail designs.",
-    link:"https://benable.com/vibefind"
-  },
-  {
-    name:"14K Gold-Plated Stud Earrings Set",
-    category:"Fashion",
-    emoji:"✨",
-    image:"",
-    description:"A five-pair CZ stud earring set.",
-    link:"https://benable.com/vibefind"
+  } catch (error) {
+    grid.textContent = error.message;
   }
-];
-
-const grid = document.getElementById("productGrid");
-const search = document.getElementById("search");
-const filter = document.getElementById("filter");
+}
 
 function renderProducts() {
-  const term = search.value.trim().toLowerCase();
-  const selected = filter.value;
+  const term = normalize(search.value);
+  const chosen = normalize(filter.value);
 
-  const filtered = products.filter(p => {
-    const matchesCategory =
-      selected === "All" || p.category === selected;
+  const matching = products.filter(product => {
+    const category = normalize(product.category);
 
-    const matchesSearch =
-      (p.name + " " + p.description + " " + p.category)
-      .toLowerCase()
-      .includes(term);
+    const categoryMatches =
+      chosen === "all" || chosen === category;
 
-    return matchesCategory && matchesSearch;
+    const searchMatches = normalize(
+      product.name + " " +
+      product.category + " " +
+      (product.description || "")
+    ).includes(term);
+
+    return categoryMatches && searchMatches;
   });
 
   grid.replaceChildren();
 
-  if (!filtered.length) {
-    const empty = document.createElement("p");
-    empty.className = "empty";
-    empty.textContent = "No products found. Try another search.";
-    grid.appendChild(empty);
+  if (!matching.length) {
+    grid.textContent = "No matching products found.";
     return;
   }
 
-  for (const p of filtered) {
+  matching.forEach(product => {
     const card = document.createElement("article");
     card.className = "product";
 
     const photo = document.createElement("div");
     photo.className = "product-image";
 
-    if (p.image) {
+    const image = httpsUrl(product.image_url);
+
+    if (image) {
       const img = document.createElement("img");
-      img.src = p.image;
-      img.alt = p.name;
+      img.src = image;
+      img.alt = product.name;
       img.loading = "lazy";
       photo.appendChild(img);
     } else {
-      photo.textContent = p.emoji;
-      photo.setAttribute("aria-label", "Category illustration");
+      photo.textContent =
+        icons[normalize(product.category)] || "🛍️";
     }
 
     const body = document.createElement("div");
@@ -845,25 +472,33 @@ function renderProducts() {
 
     const type = document.createElement("span");
     type.className = "product-type";
-    type.textContent = p.category;
+    type.textContent = product.category || "Finds";
 
     const title = document.createElement("h3");
-    title.textContent = p.name;
+    title.textContent = product.name || "Product";
 
     const description = document.createElement("p");
-    description.textContent = p.description;
+    description.textContent = product.description || "";
 
-    const button = document.createElement("a");
+    const url = httpsUrl(product.affiliate_link);
+    const button = document.createElement(
+      url ? "a" : "span"
+    );
+
     button.className = "btn";
-    button.href = p.link;
-    button.target = "_blank";
-    button.rel = "noopener noreferrer";
-    button.textContent = "Explore Find";
+    button.textContent =
+      url ? "Explore Find" : "Link unavailable";
+
+    if (url) {
+      button.href = url;
+      button.target = "_blank";
+      button.rel = "noopener noreferrer sponsored";
+    }
 
     body.append(type, title, description, button);
     card.append(photo, body);
     grid.appendChild(card);
-  }
+  });
 }
 
 search.addEventListener("input", renderProducts);
@@ -871,16 +506,22 @@ filter.addEventListener("change", renderProducts);
 
 document.querySelectorAll(".category").forEach(button => {
   button.addEventListener("click", () => {
-    filter.value = button.dataset.category;
+    const category = normalize(button.dataset.category);
+
+    const option = Array.from(filter.options).find(
+      o => normalize(o.value) === category
+    );
+
+    filter.value = option ? option.value : "All";
     renderProducts();
+
     document.getElementById("shop").scrollIntoView({
       behavior:"smooth"
     });
   });
 });
 
-renderProducts();
+loadProducts();
 </script>
-
 </body>
 </html>
