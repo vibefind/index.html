@@ -267,6 +267,26 @@ body {
         img.style.cssText = "width:100%;aspect-ratio:1/1;object-fit:contain;background:#faf7f1;";
         card.appendChild(img);
       }
+grid.replaceChildren();
+
+    if (!matching.length) {
+      grid.textContent = "More organization finds coming soon!";
+      return;
+    }
+
+    matching.forEach(product => {
+      const card = document.createElement("article");
+      card.style.cssText = "background:white;border-radius:14px;overflow:hidden;border:1px solid #e9dfd3;display:flex;flex-direction:column;";
+
+      const imageUrl = safeUrl(product.image_url);
+      if (imageUrl) {
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = product.name || "Organization product";
+        img.loading = "lazy";
+        img.style.cssText = "width:100%;aspect-ratio:1/1;object-fit:contain;background:#faf7f1;";
+        card.appendChild(img);
+      }
 
       const body = document.createElement("div");
       body.style.cssText = "padding:16px;display:flex;flex-direction:column;flex:1;";
@@ -294,6 +314,14 @@ body {
 
       card.appendChild(body);
       grid.appendChild(card);
+    });
+  } catch (err) {
+    grid.textContent = "Error loading products.";
+  }
+})();
+</script>
+</body>
+</html>
     });
   } catch (err) {
     grid.textContent = "Error loading products.";
