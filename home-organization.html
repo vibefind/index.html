@@ -306,5 +306,111 @@ justify-content:center;
   }
 })();
 </script>
+<!-- VibeFind Home Organization Products -->
+<section id="organization-products" style="padding:50px 20px;background:#f4eee7;">
+  <div style="max-width:1100px;margin:auto;">
+    <h2 style="text-align:center;">Shop Organization Finds</h2>
+    <p style="text-align:center;color:#766458;">
+      Explore our curated home and kitchen storage finds.
+    </p>
+    <div id="organization-grid" style="
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:20px;
+      margin-top:30px;
+    ">
+      Loading products...
+    </div>
+  </div>
+</section>
+<script>
+(async function () {
+  const grid = document.getElementById("organization-grid");
+  const SUPABASE_URL =
+    "https://heshxrukrkcsgpdjhzhe.supabase.co";
+  const SUPABASE_KEY =
+    "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
+  function safeUrl(value) {
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" ? url.href : null;
+    } catch {
+      return null;
+    }
+  }
+  try {
+    const response = await fetch(
+      SUPABASE_URL +
+      "/rest/v1/products?select=name,category,description,image_url,affiliate_link&order=created_at.desc",
+      { headers: { apikey: SUPABASE_KEY } }
+    );
+    if (!response.ok) throw new Error("Unable to load products.");
+    const products = await response.json();
+    const matching = products.filter(product => {
+      const category = String(product.category || "").toLowerCase();
+      const text = (
+        (product.name || "") + " " +
+        (product.description || "")
+      ).toLowerCase();
+      return (
+        ["home", "kitchen"].includes(category) &&
+        /organizer|organization|storage|container|pantry|closet|basket|rack|bins/.test(text)
+      );
+    });
+    grid.replaceChildren();
+    if (!matching.length) {
+      grid.textContent =
+        "More organization finds coming soon!";
+      return;
+    }
+    matching.forEach(product => {
+      const card = document.createElement("article");
+      card.style.cssText =
+        "background:white;border-radius:14px;overflow:hidden;border:1px solid #e9dfd3;display:flex;flex-direction:column;";
+      const imageUrl = safeUrl(product.image_url);
+      if (imageUrl) {
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = product.name || "Organization product";
+        img.loading = "lazy";
+        img.style.cssText =
+          "width:100%;aspect-ratio:1/1;object-fit:contain;background:#faf7f1;";
+        card.appendChild(img);
+      }
+      const body = document.createElement("div");
+      body.style.cssText =
+        "padding:16px;display:flex;flex-direction:column;flex:1;";
+
+      const title = document.createElement("h3");
+      title.textContent = product.name || "Product";
+      title.style.cssText = "font-size:17px;margin:0 0 10px;";
+
+      const desc = document.createElement("p");
+      desc.textContent = product.description || "";
+      desc.style.cssText =
+        "font-size:12px;color:#766458;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;";
+      body.append(title, desc);
+      const link = safeUrl(product.affiliate_link);
+      if (link) {
+        const button = document.createElement("a");
+        button.href = link;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer sponsored";
+        button.textContent = "Explore Find";
+        button.style.cssText =
+          "display:block;margin-top:auto;padding:11px;text-align:center;background:#684b3a;color:white;border-radius:7px;text-decoration:none;font-size:13px;";
+        body.appendChild(button);
+      }
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+  } catch (error) {
+    grid.textContent =
+      "Products are temporarily unavailable.";
+    console.error(error);
+  }
+})();
+</script>
+
 </body>
 </html>
