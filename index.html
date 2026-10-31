@@ -775,7 +775,6 @@ nav a:hover {
         const photo = document.createElement("div");
         photo.className = "product-image";
         const image = httpsUrl(product.image_url);
-
         if (image) {
           const img = document.createElement("img");
           img.src = image;
@@ -785,40 +784,31 @@ nav a:hover {
         } else {
           photo.textContent = icons[normalize(product.category)] || "🛍️";
         }
-
         const body = document.createElement("div");
         body.className = "product-body";
-
         const type = document.createElement("span");
         type.className = "product-type";
         type.textContent = product.category || "Finds";
-
         const title = document.createElement("h3");
         title.textContent = product.name || "Product";
-
         const description = document.createElement("p");
         description.textContent = product.description || "";
-
         const url = httpsUrl(product.affiliate_link);
         const button = document.createElement(url ? "a" : "span");
         button.className = "btn";
         button.textContent = url ? "Explore Find" : "Link unavailable";
-
         if (url) {
           button.href = url;
           button.target = "_blank";
           button.rel = "noopener noreferrer sponsored";
         }
-
-        body.append(type, title, button);
+body.append(type, title, description, button);
         card.append(photo, body);
         grid.appendChild(card);
       });
     }
-
     search.addEventListener("input", renderProducts);
     filter.addEventListener("change", renderProducts);
-
     document.querySelectorAll(".category").forEach(button => {
       button.addEventListener("click", () => {
         const category = normalize(button.dataset.category);
@@ -828,7 +818,6 @@ nav a:hover {
         document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
       });
     });
-
     loadProducts();
   </script>
 </body>
