@@ -29,7 +29,6 @@ h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.2; max-width: 850px; marg
 .button { display: inline-block; padding: 13px 24px; background: #684b3a; color: white; border-radius: 9px; text-decoration: none; font-weight: bold; font-size: 14px; }
 .button.secondary { background: #fff; color: #684b3a; border: 1px solid #c5ae9e; }
 footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61; }
-
 /* ---------- Product listing (compact cards) ---------- */
 #organization-products { padding: 50px 20px; background: #f4eee7; }
 #organization-grid {
@@ -105,13 +104,11 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
 <a class="logo" href="./">VibeFind.</a>
 <nav><a href="./">Back to Home</a></nav>
 </header>
-
 <section class="hero">
 <div class="eyebrow">Home • Storage • Organization</div>
 <h1>Beautiful Home Organization Finds</h1>
 <p>Explore practical storage inspiration for closets, kitchens, pantries, bathrooms and everyday living. Discover simple ways to organize your space.</p>
 </section>
-
 <main class="container">
 <div class="intro">
 <h2>Shop by Organization Style</h2>
@@ -140,7 +137,6 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
 </article>
 </div>
 </main>
-
 <section id="organization-products">
 <div style="max-width:1100px;margin:auto;">
 <h2 style="text-align:center;">Shop Organization Finds</h2>
@@ -148,7 +144,6 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
 <div id="organization-grid">Loading products...</div>
 </div>
 </section>
-
 <section class="cta">
 <h2>Explore More VibeFind Favorites</h2>
 <p>Browse curated fashion, home, beauty and kitchen finds.</p>
@@ -157,20 +152,16 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
 <a class="button secondary" href="https://benable.com/vibefind" target="_blank" rel="noopener sponsored">Explore VibeFind on Benable</a>
 </div>
 </section>
-
 <footer>
 <p>As an Amazon Associate I earn from qualifying purchases. Some links may be affiliate links.</p>
 <p>© VibeFind | Curated Lifestyle Finds</p>
 </footer>
-
 <script>
 (async function () {
   const grid = document.getElementById("organization-grid");
   if (!grid) return;
-
   const SUPABASE_URL = "https://heshxrukrkcsgpdjhzhe.supabase.co";
   const SUPABASE_KEY = "sb_publishable_SNzkZDVCh3xTDGRTXR2_TA_hkrzX-7Q";
-
   function safeUrl(value) {
     try {
       const url = new URL(value);
@@ -179,7 +170,6 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
       return null;
     }
   }
-
   try {
     const response = await fetch(
       SUPABASE_URL + "/rest/v1/products?select=name,category,description,image_url,affiliate_link&order=created_at.desc",
@@ -187,24 +177,19 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
     );
     if (!response.ok) throw new Error("Unable to load products.");
     const products = await response.json();
-
     const matching = products.filter(function (product) {
       const category = String(product.category || "").toLowerCase();
       return ["home", "kitchen"].includes(category);
     });
-
     grid.replaceChildren();
-
     if (!matching.length) {
       grid.style.display = "block";
       grid.textContent = "More organization finds coming soon!";
       return;
     }
-
     matching.forEach(function (product) {
       const card = document.createElement("article");
       card.className = "product-card";
-
       const imageUrl = safeUrl(product.image_url);
       if (imageUrl) {
         const img = document.createElement("img");
@@ -213,18 +198,13 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
         img.loading = "lazy";
         card.appendChild(img);
       }
-
       const body = document.createElement("div");
       body.className = "product-body";
-
       const title = document.createElement("h3");
       title.textContent = product.name || "Product";
-
       const desc = document.createElement("p");
       desc.textContent = product.description || "";
-
       body.append(title, desc);
-
       const link = safeUrl(product.affiliate_link);
       if (link) {
         const button = document.createElement("a");
@@ -235,7 +215,6 @@ footer { padding: 35px 20px; text-align: center; font-size: 12px; color: #796b61
         button.textContent = "Explore Find";
         body.appendChild(button);
       }
-
       card.appendChild(body);
       grid.appendChild(card);
     });
